@@ -116,7 +116,7 @@ public class EntityMapper<BEAN>  {
                     field.setAccessible(true);
 
                     if (isKeyField(field)) {
-                        setKeyField(field, bean, propertyMap);
+                        setKeyField(field, bean, entity);
                     }
                     else if (field.getType().isEnum()) {
                         setEnumField(field, bean, propertyMap);
@@ -144,11 +144,11 @@ public class EntityMapper<BEAN>  {
         return field.getAnnotation(Key.class) != null;
     }
 
-    private void setKeyField(Field field, BEAN bean, Map<String, Value<?>> propertyMap) {
+    private void setKeyField(Field field, BEAN bean, FullEntity entity) {
         field.setAccessible(true);
 
         try {
-            field.set(bean, EntityUtils.convertKey(propertyMap.get(field.getAnnotation(Column.class).value())));
+            field.set(bean, EntityUtils.convertKey(entity.getKey()));
         }
         catch (IllegalAccessException ex) {
 
