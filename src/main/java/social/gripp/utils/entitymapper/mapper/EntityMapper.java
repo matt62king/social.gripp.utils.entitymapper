@@ -9,6 +9,7 @@ import social.gripp.utils.entitymapper.entity.EntityUtils;
 import social.gripp.utils.entitymapper.enums.EnumDescription;
 import social.gripp.utils.entitymapper.types.DataType;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +23,19 @@ public class EntityMapper<BEAN>  {
     private Datastore datastore = new DatastoreOptions.DefaultDatastoreFactory().create(DatastoreOptions.getDefaultInstance());
     private FullEntity.Builder entityBuilder;
 
-    public FullEntity<IncompleteKey> mapBeanToEntity(final BEAN bean, MapperCallback callback) {
+    public FullEntity<IncompleteKey> mapBeanToEntity(final BEAN bean) {
+        return mapBeanToEntity(bean, null);
+    }
+
+    public FullEntity<IncompleteKey> mapBeanToEntity(final BEAN bean, @Nullable MapperCallback callback) {
         KeyFactory keyFactory = datastore.newKeyFactory().setKind(setStoreName(bean).orElse(null));
         entityBuilder = FullEntity.newBuilder(keyFactory.newKey());
 
         mapBeanValues(bean);
-        callback.mapProvidedFields(propertyMap, bean);
+
+        if (callback != null) {
+            callback.mapProvidedFields(propertyMap, bean);
+        }
 
         propertyMap.forEach((key, value) -> entityBuilder.set(key, value));
 

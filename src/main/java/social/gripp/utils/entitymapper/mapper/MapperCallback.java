@@ -5,5 +5,5 @@ import com.google.cloud.datastore.Value;
 import java.util.Map;
 
 public interface MapperCallback<BEAN> {
-    void mapProvidedFields(Map<String, Value<?>> propertyMap, BEAN bean);
+    default void mapProvidedFields(Map<String, Value<?>> propertyMap, BEAN bean) {}
 }
