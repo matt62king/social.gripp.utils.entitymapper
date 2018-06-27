@@ -1,4 +1,4 @@
-package social.gripp.utils.entitymapper.types;
+package social.gripp.utils.mapper.types;
 
 public enum DataType {
     STRING,

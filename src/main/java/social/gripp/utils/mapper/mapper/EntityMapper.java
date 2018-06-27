@@ -1,13 +1,13 @@
-package social.gripp.utils.entitymapper.mapper;
+package social.gripp.utils.mapper.mapper;
 
-import social.gripp.utils.entitymapper.annotations.Column;
-import social.gripp.utils.entitymapper.annotations.Key;
-import social.gripp.utils.entitymapper.annotations.Provided;
-import social.gripp.utils.entitymapper.annotations.Store;
+import social.gripp.utils.mapper.annotations.Column;
+import social.gripp.utils.mapper.annotations.Key;
+import social.gripp.utils.mapper.annotations.Provided;
+import social.gripp.utils.mapper.annotations.Store;
 import com.google.cloud.datastore.*;
-import social.gripp.utils.entitymapper.entity.EntityUtils;
-import social.gripp.utils.entitymapper.enums.EnumDescription;
-import social.gripp.utils.entitymapper.types.DataType;
+import social.gripp.utils.mapper.entity.EntityUtils;
+import social.gripp.utils.mapper.enums.EnumDescription;
+import social.gripp.utils.mapper.types.DataType;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;

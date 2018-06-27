@@ -1,4 +1,4 @@
-package social.gripp.utils.entitymapper;
+package social.gripp.utils.mapper;
 
 public interface HasId {
     void setId(String id);

@@ -1,4 +1,4 @@
-package social.gripp.utils.entitymapper.entity;
+package social.gripp.utils.mapper.entity;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;

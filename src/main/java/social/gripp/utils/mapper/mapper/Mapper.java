@@ -1,4 +1,4 @@
-package social.gripp.utils.entitymapper.mapper;
+package social.gripp.utils.mapper.mapper;
 
 
 import com.google.cloud.datastore.FullEntity;
