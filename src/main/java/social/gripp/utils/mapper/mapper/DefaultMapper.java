@@ -2,9 +2,6 @@ package social.gripp.utils.mapper.mapper;
 
 import com.google.cloud.datastore.FullEntity;
 import com.google.cloud.datastore.IncompleteKey;
-import com.google.cloud.datastore.Value;
-
-import java.util.Map;
 
 public class DefaultMapper<BEAN> extends Mapper<BEAN> {
     private final EntityMapper<BEAN> entityMapper = new EntityMapper<>();
@@ -29,10 +26,5 @@ public class DefaultMapper<BEAN> extends Mapper<BEAN> {
         }
 
         return null;
-    }
-
-    @Override
-    public void mapProvidedFields(Map<String, Value<?>> propertyMap, BEAN bean) {
-
     }
 }

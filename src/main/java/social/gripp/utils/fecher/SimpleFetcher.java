@@ -9,11 +9,11 @@ public class SimpleFetcher extends Fetcher {
     }
 
     public QueryResults<Entity> fetchBySingleProperty(String storeName, String property, String value) {
-        Query<Entity> clientQuery = Query.newEntityQueryBuilder()
+        Query<Entity> query = Query.newEntityQueryBuilder()
                 .setKind(storeName)
                 .setFilter(StructuredQuery.PropertyFilter.eq(property, value))
                 .build();
 
-        return getDatastore().run(clientQuery);
+        return getDatastore().run(query);
     }
 }
