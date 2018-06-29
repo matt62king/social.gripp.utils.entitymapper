@@ -37,7 +37,7 @@ public class MultiEntityFetcher extends Fetcher {
     public Map<String, QueryResults<Entity>> fetch(String value) {
         Map<String, QueryResults<Entity>> resultsMap = new HashMap<>();
 
-        stores.stream().forEach(store ->
+        stores.forEach(store ->
             resultsMap.put(store, simpleFetcher.fetchBySingleProperty(store, joinProperty, value))
         );
 
