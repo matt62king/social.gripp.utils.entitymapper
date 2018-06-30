@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class MultiEntityFetcher extends Fetcher {
     private final SimpleFetcher simpleFetcher;
@@ -23,9 +24,11 @@ public class MultiEntityFetcher extends Fetcher {
     }
 
     public MultiEntityFetcher fetchFrom(String... stores) {
-        for (String store : stores) {
-            this.stores.add(store);
-        }
+        return fetchFromStores(stores);
+    }
+
+    public MultiEntityFetcher fetchFromStores(String[] stores) {
+        Stream.of(stores).forEach(s -> this.stores.add(s));
 
         return this;
     }
