@@ -1,6 +1,7 @@
-package social.gripp.utils.fecher;
+package social.gripp.utils.fecher.manual;
 
 import com.google.cloud.datastore.*;
+import social.gripp.utils.fecher.Fetcher;
 
 public class SimpleFetcher extends Fetcher {
 

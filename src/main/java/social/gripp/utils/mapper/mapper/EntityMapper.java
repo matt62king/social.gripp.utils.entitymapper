@@ -3,17 +3,16 @@ package social.gripp.utils.mapper.mapper;
 import social.gripp.utils.mapper.annotations.Column;
 import social.gripp.utils.mapper.annotations.Key;
 import social.gripp.utils.mapper.annotations.Provided;
-import social.gripp.utils.mapper.annotations.Store;
 import com.google.cloud.datastore.*;
 import social.gripp.utils.mapper.entity.EntityUtils;
 import social.gripp.utils.mapper.enums.EnumDescription;
 import social.gripp.utils.mapper.types.DataType;
+import social.gripp.utils.utils.AnnotationUtils;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,7 +27,7 @@ public class EntityMapper<BEAN>  {
     }
 
     public FullEntity<IncompleteKey> mapBeanToEntity(final BEAN bean, @Nullable MapperCallback callback) {
-        KeyFactory keyFactory = datastore.newKeyFactory().setKind(setStoreName(bean).orElse(null));
+        KeyFactory keyFactory = datastore.newKeyFactory().setKind(AnnotationUtils.getStoreName(bean.getClass()));
         entityBuilder = FullEntity.newBuilder(keyFactory.newKey());
 
         mapBeanValues(bean);
@@ -40,10 +39,6 @@ public class EntityMapper<BEAN>  {
         propertyMap.forEach((key, value) -> entityBuilder.set(key, value));
 
         return Entity.newBuilder(entityBuilder.build()).build();
-    }
-
-    private Optional<String> setStoreName(final BEAN bean) {
-        return Optional.ofNullable(bean.getClass().getAnnotation(Store.class).value());
     }
 
     private void mapBeanValues(final BEAN bean) {
@@ -78,7 +73,7 @@ public class EntityMapper<BEAN>  {
 
             if (enumField != null) {
                 setPropertyIfPresent(
-                        field.getAnnotation(Column.class).value(),
+                        AnnotationUtils.getColumnValue(field),
                         enumField instanceof EnumDescription ? ((EnumDescription) enumField).getDescription() : enumField.name(),
                         DataType.STRING);
             }
@@ -93,9 +88,9 @@ public class EntityMapper<BEAN>  {
 
         try {
             setPropertyIfPresent(
-                    field.getAnnotation(Column.class).value(),
+                    AnnotationUtils.getColumnValue(field),
                     field.get(bean),
-                    field.getAnnotation(Column.class).dataType());
+                    AnnotationUtils.getColumnDataType(field));
         }
         catch (IllegalAccessException ex) {
 
@@ -132,7 +127,7 @@ public class EntityMapper<BEAN>  {
     private boolean shouldMapPropertyToField(Field field, Map<String, Value<?>> propertyMap) {
         return field.getAnnotation(Column.class) != null
                 && !isProvidedOnOut(field)
-                && propertyMap.containsKey(field.getAnnotation(Column.class).value());
+                && propertyMap.containsKey(AnnotationUtils.getColumnValue(field));
     }
 
     private boolean isProvidedOnOut(Field field) {
@@ -159,7 +154,7 @@ public class EntityMapper<BEAN>  {
         field.setAccessible(true);
 
         try {
-            String value = (String) propertyMap.get(field.getAnnotation(Column.class).value()).get();
+            String value = (String) propertyMap.get(AnnotationUtils.getColumnValue(field)).get();
 
             for (Enum enums : (Enum[]) field.getType().getEnumConstants()) {
                 if (enums instanceof EnumDescription && matchesEnumDesription((EnumDescription) enums, value)) {
@@ -179,12 +174,12 @@ public class EntityMapper<BEAN>  {
 
     private void setField(Field field, BEAN bean, Map<String, Value<?>> propertyMap) {
         field.setAccessible(true);
-        DataType dataType = field.getAnnotation(Column.class).dataType();
+        DataType dataType = AnnotationUtils.getColumnDataType(field);
 
         try {
             switch (dataType) {
-                case STRING: field.set(bean, (String) propertyMap.get(field.getAnnotation(Column.class).value()).get());    break;
-                case LONG: field.set(bean, (Long) propertyMap.get(field.getAnnotation(Column.class).value()).get());        break;
+                case STRING: field.set(bean, (String) propertyMap.get(AnnotationUtils.getColumnValue(field)).get());    break;
+                case LONG: field.set(bean, (Long) propertyMap.get(AnnotationUtils.getColumnValue(field)).get());        break;
             }
         }
         catch (IllegalAccessException ex) {
