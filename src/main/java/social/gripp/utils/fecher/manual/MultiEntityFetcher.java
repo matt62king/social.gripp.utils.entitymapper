@@ -1,8 +1,9 @@
-package social.gripp.utils.fecher;
+package social.gripp.utils.fecher.manual;
 
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.QueryResults;
+import social.gripp.utils.fecher.Fetcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
