@@ -8,6 +8,8 @@ import social.gripp.utils.mapper.entity.EntityUtils;
 import social.gripp.utils.mapper.enums.EnumDescription;
 import social.gripp.utils.mapper.types.DataType;
 import social.gripp.utils.utils.AnnotationUtils;
+import social.gripp.utils.utils.ByteBufferUtils;
+import social.gripp.utils.utils.PropertyConversionUtils;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -178,8 +180,11 @@ public class EntityMapper<BEAN>  {
 
         try {
             switch (dataType) {
-                case STRING: field.set(bean, (String) propertyMap.get(AnnotationUtils.getColumnValue(field)).get());    break;
-                case LONG: field.set(bean, (Long) propertyMap.get(AnnotationUtils.getColumnValue(field)).get());        break;
+                case BLOB: field.set(bean, PropertyConversionUtils.convertFromBlob(
+                        (Blob) propertyMap.get(AnnotationUtils.getColumnValue(field)).get()));                  break;
+
+                case STRING: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());    break;
+                case LONG: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());      break;
             }
         }
         catch (IllegalAccessException ex) {
@@ -190,8 +195,9 @@ public class EntityMapper<BEAN>  {
     public void setPropertyIfPresent(String property, Object object, DataType dataType) {
         if (object != null) {
             switch (dataType) {
-                case STRING: propertyMap.put(property, StringValue.of((String) object));    break;
-                case LONG: propertyMap.put(property, LongValue.of((Long) object));          break;
+                case BLOB: propertyMap.put(property, BlobValue.of(PropertyConversionUtils.convertToBlob(object)));  break;
+                case STRING: propertyMap.put(property, StringValue.of((String) object));                            break;
+                case LONG: propertyMap.put(property, LongValue.of((Long) object));                                  break;
             }
         }
     }
