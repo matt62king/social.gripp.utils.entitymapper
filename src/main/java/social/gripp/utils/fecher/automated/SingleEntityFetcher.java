@@ -7,7 +7,6 @@ import social.gripp.utils.exceptions.NoIndexedIdException;
 import social.gripp.utils.fecher.Fetcher;
 import social.gripp.utils.fecher.annotaions.IndexedID;
 import social.gripp.utils.fecher.manual.SimpleFetcher;
-import social.gripp.utils.mapper.annotations.Column;
 import social.gripp.utils.utils.AnnotationUtils;
 
 import java.lang.reflect.Field;
@@ -31,6 +30,6 @@ public class SingleEntityFetcher extends Fetcher {
                 .filter(field -> field.getAnnotation(IndexedID.class) != null)
                 .findFirst().orElseThrow(() -> new NoIndexedIdException(clazz));
 
-        return fieldOptional.getAnnotation(Column.class).value();
+        return AnnotationUtils.getColumnValue(fieldOptional);
     }
 }
