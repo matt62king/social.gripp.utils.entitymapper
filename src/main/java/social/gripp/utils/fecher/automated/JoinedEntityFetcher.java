@@ -27,7 +27,7 @@ public class JoinedEntityFetcher extends Fetcher {
 
         queryResultsMap.put(AnnotationUtils.getStoreName(clazz), singleEntityFetcher.fetchedByIndexedId(clazz, value));
         queryResultsMap.putAll(multiEntityFetcher
-                .fetchFrom(AnnotationUtils.getJoinedStores(clazz))
+                .fetchFromStores(AnnotationUtils.getJoinedStores(clazz))
                 .joinOn(AnnotationUtils.getJoinedIndex(clazz))
                 .fetch(value));
 
