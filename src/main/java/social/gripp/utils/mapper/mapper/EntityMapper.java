@@ -181,8 +181,8 @@ public class EntityMapper<BEAN>  {
                 case BLOB: field.set(bean, PropertyConversionUtils.convertFromBlob(
                         (Blob) propertyMap.get(AnnotationUtils.getColumnValue(field)).get()));                  break;
 
-                case STRING: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());    break;
-                case LONG: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());      break;
+                case STRING: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());     break;
+                case LONG: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());       break;
             }
         }
         catch (IllegalAccessException ex) {
@@ -193,9 +193,11 @@ public class EntityMapper<BEAN>  {
     public void setPropertyIfPresent(String property, Object object, DataType dataType) {
         if (object != null) {
             switch (dataType) {
-                case BLOB: propertyMap.put(property, BlobValue.of(PropertyConversionUtils.convertToBlob(object)));  break;
-                case STRING: propertyMap.put(property, StringValue.of((String) object));                            break;
-                case LONG: propertyMap.put(property, LongValue.of((Long) object));                                  break;
+                case BLOB: propertyMap.put(property, BlobValue.newBuilder(
+                        PropertyConversionUtils.convertToBlob(object)).setExcludeFromIndexes(true).build());     break;
+
+                case STRING: propertyMap.put(property, StringValue.of((String) object));                         break;
+                case LONG: propertyMap.put(property, LongValue.of((Long) object));                               break;
             }
         }
     }
