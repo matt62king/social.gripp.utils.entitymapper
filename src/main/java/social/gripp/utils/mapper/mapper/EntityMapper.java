@@ -56,13 +56,8 @@ public class EntityMapper<BEAN>  {
 
     private boolean shouldMapFieldToProperty(Field field) {
         return field.getAnnotation(Column.class) != null
-                && field.getAnnotation(EntityKey.class) == null
-                && !isProvidedOnIn(field);
-    }
-
-    private boolean isProvidedOnIn(Field field) {
-        return field.getAnnotation(Provided.class) != null
-                && field.getAnnotation(Provided.class).in();
+                && !AnnotationUtils.isKeyField(field)
+                && !AnnotationUtils.isProvidedOnIn(field);
     }
 
     private void tryToSetEntityEnumProperty(Field field, final  BEAN bean) {
@@ -98,6 +93,10 @@ public class EntityMapper<BEAN>  {
     }
 
     public BEAN mapEntityToBean(FullEntity<?> entity, BEAN bean) {
+        return mapEntityToBean(entity, bean, null);
+    }
+
+    private BEAN mapEntityToBean(FullEntity<?> entity, BEAN bean, @Nullable MapperCallback callback) {
         Map<String, Value<?>> propertyMap = entity.getNames().stream()
                 .filter(entity::contains)
                 .collect(Collectors.toMap(
@@ -110,7 +109,7 @@ public class EntityMapper<BEAN>  {
                 .forEach(field -> {
                     field.setAccessible(true);
 
-                    if (isKeyField(field)) {
+                    if (AnnotationUtils.isKeyField(field)) {
                         setKeyField(field, bean, entity);
                     }
                     else if (field.getType().isEnum()) {
@@ -121,22 +120,18 @@ public class EntityMapper<BEAN>  {
                     }
                 });
 
+        if (callback != null) {
+            callback.mapProvidedProperties(propertyMap, bean);
+        }
+
         return bean;
     }
 
     private boolean shouldMapPropertyToField(Field field, Map<String, Value<?>> propertyMap) {
-        return field.getAnnotation(Column.class) != null
-                && !isProvidedOnOut(field)
-                && propertyMap.containsKey(AnnotationUtils.getColumnValue(field));
-    }
-
-    private boolean isProvidedOnOut(Field field) {
-        return field.getAnnotation(Provided.class) != null
-                && field.getAnnotation(Provided.class).out();
-    }
-
-    private boolean isKeyField(Field field) {
-        return field.getAnnotation(EntityKey.class) != null;
+        return (field.getAnnotation(Column.class) != null
+                && !AnnotationUtils.isProvidedOnOut(field)
+                && propertyMap.containsKey(AnnotationUtils.getColumnValue(field)))
+                || AnnotationUtils.isKeyField(field);
     }
 
     private void setKeyField(Field field, BEAN bean, FullEntity entity) {
@@ -179,7 +174,7 @@ public class EntityMapper<BEAN>  {
         try {
             switch (dataType) {
                 case BLOB: field.set(bean, PropertyConversionUtils.convertFromBlob(
-                        (Blob) propertyMap.get(AnnotationUtils.getColumnValue(field)).get()));                  break;
+                        (Blob) propertyMap.get(AnnotationUtils.getColumnValue(field)).get(), field.getType())); break;
 
                 case STRING: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());     break;
                 case LONG: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());       break;
