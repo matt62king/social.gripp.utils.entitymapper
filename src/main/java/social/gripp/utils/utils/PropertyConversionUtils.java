@@ -2,6 +2,10 @@ package social.gripp.utils.utils;
 
 import com.google.cloud.datastore.Blob;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 public class PropertyConversionUtils {
 
     public static <T> Blob convertToBlob(T type) {
@@ -9,6 +13,14 @@ public class PropertyConversionUtils {
     }
 
     public static <T> T convertFromBlob(Blob blob, Class<T> clazz) {
-        return ByteBufferUtils.deserialize(blob.asReadOnlyByteBuffer(), clazz);
+        try {
+            ByteArrayInputStream bos = new ByteArrayInputStream(blob.toByteArray());
+            ObjectInputStream is = new ObjectInputStream(bos);
+            return (T) is.readObject();
+        }
+        catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
