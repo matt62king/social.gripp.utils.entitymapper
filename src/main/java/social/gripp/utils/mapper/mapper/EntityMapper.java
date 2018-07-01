@@ -96,7 +96,7 @@ public class EntityMapper<BEAN>  {
         return mapEntityToBean(entity, bean, null);
     }
 
-    private BEAN mapEntityToBean(FullEntity<?> entity, BEAN bean, @Nullable MapperCallback callback) {
+    public BEAN mapEntityToBean(FullEntity<?> entity, BEAN bean, @Nullable MapperCallback callback) {
         Map<String, Value<?>> propertyMap = entity.getNames().stream()
                 .filter(entity::contains)
                 .collect(Collectors.toMap(
