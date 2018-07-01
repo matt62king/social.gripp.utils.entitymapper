@@ -9,6 +9,6 @@ public class PropertyConversionUtils {
     }
 
     public static <T> T convertFromBlob(Blob blob, Class<T> clazz) {
-        return ByteBufferUtils.deserialize(blob.asReadOnlyByteBuffer());
+        return ByteBufferUtils.deserialize(blob.asReadOnlyByteBuffer(), clazz);
     }
 }

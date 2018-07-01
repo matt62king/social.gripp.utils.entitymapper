@@ -22,7 +22,7 @@ public class ByteBufferUtils {
         }
     }
 
-    public static <T> T deserialize(ByteBuffer byteBuffer) {
+    public static <T> T deserialize(ByteBuffer byteBuffer, Class<T> clazz) {
         ByteArrayInputStream bais = new ByteArrayInputStream(byteBuffer.array());
 
         try (ObjectInputStream oip = new ObjectInputStream(bais)) {
