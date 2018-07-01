@@ -1,14 +1,12 @@
 package social.gripp.utils.mapper.mapper;
 
 import social.gripp.utils.mapper.annotations.Column;
-import social.gripp.utils.mapper.annotations.Key;
+import social.gripp.utils.mapper.annotations.EntityKey;
 import social.gripp.utils.mapper.annotations.Provided;
 import com.google.cloud.datastore.*;
-import social.gripp.utils.mapper.entity.EntityUtils;
 import social.gripp.utils.mapper.enums.EnumDescription;
 import social.gripp.utils.mapper.types.DataType;
 import social.gripp.utils.utils.AnnotationUtils;
-import social.gripp.utils.utils.ByteBufferUtils;
 import social.gripp.utils.utils.PropertyConversionUtils;
 
 import javax.annotation.Nullable;
@@ -58,7 +56,7 @@ public class EntityMapper<BEAN>  {
 
     private boolean shouldMapFieldToProperty(Field field) {
         return field.getAnnotation(Column.class) != null
-                && field.getAnnotation(Key.class) == null
+                && field.getAnnotation(EntityKey.class) == null
                 && !isProvidedOnIn(field);
     }
 
@@ -138,14 +136,14 @@ public class EntityMapper<BEAN>  {
     }
 
     private boolean isKeyField(Field field) {
-        return field.getAnnotation(Key.class) != null;
+        return field.getAnnotation(EntityKey.class) != null;
     }
 
     private void setKeyField(Field field, BEAN bean, FullEntity entity) {
         field.setAccessible(true);
 
         try {
-            field.set(bean, EntityUtils.convertKey(entity.getKey()));
+            field.set(bean, entity.getKey());
         }
         catch (IllegalAccessException ex) {
 
