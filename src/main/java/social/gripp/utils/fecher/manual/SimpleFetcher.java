@@ -17,4 +17,13 @@ public class SimpleFetcher extends Fetcher {
 
         return getDatastore().run(query);
     }
+
+    public QueryResults<Entity> fetchByMulitpleProperties(String storeName, StructuredQuery.PropertyFilter filter, StructuredQuery.PropertyFilter... filters) {
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind(storeName)
+                .setFilter(StructuredQuery.CompositeFilter.and(filter, filters))
+                .build();
+
+        return getDatastore().run(query);
+    }
 }
