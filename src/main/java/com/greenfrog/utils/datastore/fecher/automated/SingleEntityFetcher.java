@@ -7,11 +7,14 @@ import com.greenfrog.utils.datastore.exceptions.InvalidMapperException;
 import com.greenfrog.utils.datastore.exceptions.NoIndexedIdException;
 import com.greenfrog.utils.datastore.fecher.Fetcher;
 import com.greenfrog.utils.datastore.fecher.annotaions.IndexedID;
+import com.greenfrog.utils.datastore.fecher.annotaions.MapConstructor;
 import com.greenfrog.utils.datastore.fecher.manual.SimpleFetcher;
 import com.greenfrog.utils.datastore.mapper.mapper.DefaultMapper;
 import com.greenfrog.utils.datastore.mapper.mapper.Mapper;
 import com.greenfrog.utils.datastore.utils.AnnotationUtils;
 
+import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +41,10 @@ public class SingleEntityFetcher extends Fetcher {
     private  <T> Mapper<T> getMapperForClass(Class<T> clazz) {
         try {
             if (AnnotationUtils.hasMapperClass(clazz)) {
-                return AnnotationUtils.getMapperClass(clazz).newInstance();
+                Class<? extends Mapper> mapperClass = AnnotationUtils.getMapperClass(clazz);
+                Constructor constructor = getAnnotatedConstructor(mapperClass);
+
+                return (Mapper<T>) constructor.newInstance();
             }
             else {
                 return new DefaultMapper<>(clazz);
@@ -46,6 +52,12 @@ public class SingleEntityFetcher extends Fetcher {
         } catch (Exception ex) {
             throw new InvalidMapperException(clazz);
         }
+    }
+
+    private Constructor getAnnotatedConstructor(Class<?> clazz) {
+        return Stream.of(clazz.getConstructors())
+                .filter(constructor -> constructor.getDeclaredAnnotation(MapConstructor.class) != null)
+                .findFirst().orElseThrow(() -> new InvalidMapperException(clazz));
     }
 
     public QueryResults<Entity> fetchedByIndexedId(Class bClass, String value) {
