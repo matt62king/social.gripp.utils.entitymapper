@@ -42,7 +42,7 @@ public class EntityMapper<BEAN>  {
         return Entity.newBuilder(entityBuilder.build()).build();
     }
 
-    private IncompleteKey createNewKey(BEAN bean) {
+    private IncompleteKey createNewKey(final BEAN bean) {
         KeyFactory keyFactory = datastore.newKeyFactory().setKind(AnnotationUtils.getStoreName(bean.getClass()));
         return keyFactory.newKey();
     }
