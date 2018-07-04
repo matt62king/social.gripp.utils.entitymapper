@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Mapper {
     Class<? extends com.greenfrog.utils.datastore.mapper.mapper.Mapper> value();
-    String cacheKey();
+    String cacheKey() default "";
 }
