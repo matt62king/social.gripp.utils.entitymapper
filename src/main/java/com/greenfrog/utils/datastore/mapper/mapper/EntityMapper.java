@@ -1,5 +1,6 @@
 package com.greenfrog.utils.datastore.mapper.mapper;
 
+import com.greenfrog.utils.datastore.utils.MapperUtils;
 import com.greenfrog.utils.datastore.utils.PropertyConversionUtils;
 import com.greenfrog.utils.datastore.mapper.annotations.Column;
 import com.google.cloud.datastore.*;
@@ -11,6 +12,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,8 +27,8 @@ public class EntityMapper<BEAN>  {
     }
 
     public FullEntity<IncompleteKey> mapBeanToEntity(final BEAN bean, @Nullable MapperCallback callback) {
-        KeyFactory keyFactory = datastore.newKeyFactory().setKind(AnnotationUtils.getStoreName(bean.getClass()));
-        entityBuilder = FullEntity.newBuilder(keyFactory.newKey());
+        Optional<Key> optionalKey = MapperUtils.getKey(bean);
+        entityBuilder = FullEntity.newBuilder(optionalKey.isPresent() ? optionalKey.get() : createNewKey(bean));
 
         mapBeanValues(bean);
 
@@ -34,9 +36,15 @@ public class EntityMapper<BEAN>  {
             callback.mapProvidedFields(propertyMap, bean);
         }
 
+
         propertyMap.forEach((key, value) -> entityBuilder.set(key, value));
 
         return Entity.newBuilder(entityBuilder.build()).build();
+    }
+
+    private IncompleteKey createNewKey(BEAN bean) {
+        KeyFactory keyFactory = datastore.newKeyFactory().setKind(AnnotationUtils.getStoreName(bean.getClass()));
+        return keyFactory.newKey();
     }
 
     private void mapBeanValues(final BEAN bean) {

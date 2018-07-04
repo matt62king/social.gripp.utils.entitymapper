@@ -1,10 +1,12 @@
 package com.greenfrog.utils.datastore.utils;
 
 import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.QueryResults;
 import com.greenfrog.utils.datastore.exceptions.InvalidMapperException;
 import com.greenfrog.utils.datastore.exceptions.NoIndexedIdException;
 import com.greenfrog.utils.datastore.fecher.annotaions.MapConstructor;
+import com.greenfrog.utils.datastore.mapper.annotations.EntityKey;
 import com.greenfrog.utils.datastore.mapper.mapper.DefaultMapper;
 import com.greenfrog.utils.datastore.mapper.mapper.Mapper;
 
@@ -12,6 +14,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class MapperUtils {
@@ -55,5 +58,26 @@ public class MapperUtils {
         }
 
         return beanList;
+    }
+
+    public static <B> Optional<Key> getKey(B bean) {
+        Optional<Field> keyField = Stream.of(bean.getClass().getDeclaredFields())
+                .filter(field -> field.getAnnotation(EntityKey.class) != null)
+                .findFirst();
+
+        try {
+            if (keyField.isPresent()) {
+                keyField.get().setAccessible(true);
+                return Optional.ofNullable((Key) keyField.get().get(bean));
+            }
+            else {
+                return Optional.empty();
+            }
+        }
+        catch (IllegalAccessException ex) {
+
+        }
+
+        return Optional.empty();
     }
 }
