@@ -6,8 +6,11 @@ import com.google.cloud.datastore.QueryResults;
 import com.greenfrog.utils.datastore.fecher.Fetcher;
 import com.greenfrog.utils.datastore.fecher.manual.MultiEntityFetcher;
 import com.greenfrog.utils.datastore.utils.AnnotationUtils;
+import com.greenfrog.utils.datastore.utils.MapperUtils;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JoinedEntityFetcher extends Fetcher {
@@ -20,6 +23,35 @@ public class JoinedEntityFetcher extends Fetcher {
 
         this.multiEntityFetcher = new MultiEntityFetcher(datastore);
         this.singleEntityFetcher = new SingleEntityFetcher(datastore);
+    }
+
+    public <T> List<T> fetchEntityAndJoinedByIndexedId(Class<T> clazz, String value) {
+        return fetchEntityAndJoinedByProperty(clazz, MapperUtils.getIndexedId(clazz), value);
+    }
+
+    public <T> List<T> fetchEntityAndJoinedByProperty(Class<T> clazz, String property, String value) {
+        List<T> entities = singleEntityFetcher.getBySingleProperty(clazz, property, value);
+        entities.forEach(entity -> populateToManyRelationships(entity, property, value));
+
+        return entities;
+    }
+
+    private <T> void populateToManyRelationships(T entity, String property, String value) {
+        MapperUtils.getToManyRelationalFields(entity.getClass())
+                .forEach(field -> setRelationList(entity, field, property, value));
+    }
+
+    private <T> void setRelationList(T entity, Field field, String property, String value) {
+        try {
+            field.setAccessible(true);
+            field.set(entity, singleEntityFetcher.getBySingleProperty(
+                    AnnotationUtils.getToManyEntityClass(field),
+                    property,
+                    value));
+        }
+        catch (IllegalAccessException ex) {
+
+        }
     }
 
     public Map<String, QueryResults<Entity>> fetchAllEntityAndJoins(Class clazz, String value) {

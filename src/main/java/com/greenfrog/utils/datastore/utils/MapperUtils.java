@@ -15,11 +15,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MapperUtils {
 
-    public static   <T> Mapper<T> getMapperForClass(Class<T> clazz) {
+    public static <T> Mapper<T> getMapperForClass(Class<T> clazz) {
         try {
             if (AnnotationUtils.hasMapperClass(clazz)) {
                 Class<? extends Mapper> mapperClass = AnnotationUtils.getMapperClass(clazz);
@@ -79,5 +80,11 @@ public class MapperUtils {
         }
 
         return Optional.empty();
+    }
+
+    public static <T> List<Field> getToManyRelationalFields(Class<T> clazz) {
+        return Stream.of(clazz.getDeclaredFields())
+                .filter(AnnotationUtils::isToManyRelation)
+                .collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ package com.greenfrog.utils.datastore.utils;
 import com.greenfrog.utils.datastore.fecher.annotaions.IndexedID;
 import com.greenfrog.utils.datastore.fecher.annotaions.Join;
 import com.greenfrog.utils.datastore.fecher.annotaions.Mapper;
+import com.greenfrog.utils.datastore.fecher.annotaions.ToMany;
 import com.greenfrog.utils.datastore.mapper.annotations.Column;
 import com.greenfrog.utils.datastore.mapper.annotations.EntityKey;
 import com.greenfrog.utils.datastore.mapper.annotations.Provided;
@@ -41,6 +42,14 @@ public class AnnotationUtils {
         return field.getAnnotation(Column.class).dataType();
     }
 
+    public static <T> Class<T> getToManyEntityClass(Field field) {
+        return field.getAnnotation(ToMany.class).entity();
+    }
+
+    public static String getToManyJoinProperty(Field field) {
+        return field.getAnnotation(ToMany.class).on();
+    }
+
     public static boolean isKeyField(Field field) {
         return field.getAnnotation(EntityKey.class) != null;
     }
@@ -55,5 +64,9 @@ public class AnnotationUtils {
 
     public static boolean isProvidedOnOut(Field field){
         return field.getAnnotation(Provided.class) != null && field.getAnnotation(Provided.class).out();
+    }
+
+    public static boolean isToManyRelation(Field field) {
+        return field.getAnnotation(ToMany.class) != null;
     }
 }
