@@ -1,5 +1,6 @@
 package com.greenfrog.utils.datastore.utils;
 
+import com.greenfrog.utils.datastore.cache.annotaions.Cache;
 import com.greenfrog.utils.datastore.fecher.annotaions.IndexedID;
 import com.greenfrog.utils.datastore.fecher.annotaions.Join;
 import com.greenfrog.utils.datastore.fecher.annotaions.Mapper;
@@ -8,6 +9,7 @@ import com.greenfrog.utils.datastore.mapper.annotations.Column;
 import com.greenfrog.utils.datastore.mapper.annotations.EntityKey;
 import com.greenfrog.utils.datastore.mapper.annotations.Provided;
 import com.greenfrog.utils.datastore.mapper.annotations.Store;
+import com.greenfrog.utils.datastore.mapper.mapper.DefaultMapper;
 import com.greenfrog.utils.datastore.mapper.types.DataType;
 
 import java.lang.reflect.Field;
@@ -27,11 +29,21 @@ public class AnnotationUtils {
     }
 
     public static <T> Class<? extends com.greenfrog.utils.datastore.mapper.mapper.Mapper> getMapperClass(Class<T> clazz) {
+        if (clazz.getAnnotation(Mapper.class) == null) {
+            return clazz.getAnnotation(Store.class).mapper();
+        }
         return clazz.getAnnotation(Mapper.class).value();
     }
 
     public static <T> boolean hasMapperClass(Class<T> clazz) {
-        return clazz.getAnnotation(Mapper.class) != null;
+        return clazz.getAnnotation(Mapper.class) != null
+                || (clazz.getAnnotation(Store.class) != null
+                && !clazz.getAnnotation(Store.class).mapper().getName().equals(DefaultMapper.class.getName()));
+    }
+
+    public static <T> boolean usesCache(Class<T> clazz) {
+        return clazz.getAnnotation(Cache.class) != null ||
+                (clazz.getAnnotation(Store.class) != null && !clazz.getAnnotation(Store.class).cache());
     }
 
     public static String getColumnValue(Field field) {
@@ -43,7 +55,7 @@ public class AnnotationUtils {
     }
 
     public static <T> Class<T> getToManyEntityClass(Field field) {
-        return field.getAnnotation(ToMany.class).entity();
+        return field.getAnnotation(ToMany.class).value();
     }
 
     public static String getToManyJoinProperty(Field field) {

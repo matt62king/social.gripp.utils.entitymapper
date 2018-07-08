@@ -3,15 +3,17 @@ package com.greenfrog.utils.datastore.fecher.automated;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.QueryResults;
+import com.greenfrog.utils.datastore.cache.DatastoreCache;
+import com.greenfrog.utils.datastore.cache.key.CacheKey;
+import com.greenfrog.utils.datastore.cache.key.CacheKeyBuilder;
 import com.greenfrog.utils.datastore.fecher.Fetcher;
 import com.greenfrog.utils.datastore.fecher.manual.MultiEntityFetcher;
 import com.greenfrog.utils.datastore.utils.AnnotationUtils;
+import com.greenfrog.utils.datastore.utils.CacheUtils;
 import com.greenfrog.utils.datastore.utils.MapperUtils;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JoinedEntityFetcher extends Fetcher {
 
@@ -19,10 +21,17 @@ public class JoinedEntityFetcher extends Fetcher {
     private final SingleEntityFetcher singleEntityFetcher;
 
     public JoinedEntityFetcher(Datastore datastore) {
-        super(datastore);
+        super(datastore, null);
 
         this.multiEntityFetcher = new MultiEntityFetcher(datastore);
         this.singleEntityFetcher = new SingleEntityFetcher(datastore);
+    }
+
+    public JoinedEntityFetcher(Datastore datastore, DatastoreCache datastoreCache) {
+        super(datastore, datastoreCache);
+
+        this.multiEntityFetcher = new MultiEntityFetcher(datastore);
+        this.singleEntityFetcher = new SingleEntityFetcher(datastore, datastoreCache);
     }
 
     public <T> List<T> fetchEntityAndJoinedByIndexedId(Class<T> clazz, String value) {
@@ -57,7 +66,10 @@ public class JoinedEntityFetcher extends Fetcher {
     public Map<String, QueryResults<Entity>> fetchAllEntityAndJoins(Class clazz, String value) {
         Map<String, QueryResults<Entity>> queryResultsMap = new HashMap<>();
 
-        queryResultsMap.put(AnnotationUtils.getStoreName(clazz), singleEntityFetcher.fetchedByIndexedId(clazz, value));
+        queryResultsMap.put(
+                AnnotationUtils.getStoreName(clazz),
+                singleEntityFetcher.fetchedBySingleProperty(clazz, MapperUtils.getIndexedId(clazz), value));
+
         queryResultsMap.putAll(multiEntityFetcher
                 .fetchFromStores(AnnotationUtils.getJoinedStores(clazz))
                 .joinOn(AnnotationUtils.getJoinedIndex(clazz))

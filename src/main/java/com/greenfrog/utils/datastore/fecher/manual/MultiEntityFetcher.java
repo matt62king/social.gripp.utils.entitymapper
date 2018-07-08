@@ -3,6 +3,7 @@ package com.greenfrog.utils.datastore.fecher.manual;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.QueryResults;
+import com.greenfrog.utils.datastore.cache.DatastoreCache;
 import com.greenfrog.utils.datastore.fecher.Fetcher;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class MultiEntityFetcher extends Fetcher {
     private String joinProperty;
 
     public MultiEntityFetcher(Datastore datastore) {
-        super(datastore);
+        super(datastore, null);
 
         this.simpleFetcher = new SimpleFetcher(datastore);
     }

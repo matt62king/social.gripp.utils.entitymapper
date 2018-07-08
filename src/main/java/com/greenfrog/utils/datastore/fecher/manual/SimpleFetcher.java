@@ -1,12 +1,13 @@
 package com.greenfrog.utils.datastore.fecher.manual;
 
 import com.google.cloud.datastore.*;
+import com.greenfrog.utils.datastore.cache.DatastoreCache;
 import com.greenfrog.utils.datastore.fecher.Fetcher;
 
 public class SimpleFetcher extends Fetcher {
 
     public SimpleFetcher(Datastore datastore) {
-        super(datastore);
+        super(datastore, null);
     }
 
     public QueryResults<Entity> fetchBySingleProperty(String storeName, String property, String value) {
