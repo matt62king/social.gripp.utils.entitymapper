@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class EntityMapper<BEAN>  {
+public class EntityMapper<BEAN>  {
 
     private Map<String, Value<?>> propertyMap = new HashMap<>();
     private Datastore datastore = new DatastoreOptions.DefaultDatastoreFactory().create(DatastoreOptions.getDefaultInstance());
