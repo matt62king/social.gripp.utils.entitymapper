@@ -1,5 +1,6 @@
 package com.greenfrog.utils.datastore.mapper.mapper;
 
+import com.greenfrog.utils.datastore.exceptions.FieldAccessException;
 import com.greenfrog.utils.datastore.utils.MapperUtils;
 import com.greenfrog.utils.datastore.utils.PropertyConversionUtils;
 import com.greenfrog.utils.datastore.mapper.annotations.Column;
@@ -16,11 +17,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EntityMapper<BEAN>  {
+class EntityMapper<BEAN>  {
 
     private Map<String, Value<?>> propertyMap = new HashMap<>();
     private Datastore datastore = new DatastoreOptions.DefaultDatastoreFactory().create(DatastoreOptions.getDefaultInstance());
-    private FullEntity.Builder entityBuilder;
 
     public FullEntity<IncompleteKey> mapBeanToEntity(final BEAN bean) {
         return mapBeanToEntity(bean, null);
@@ -28,7 +28,7 @@ public class EntityMapper<BEAN>  {
 
     public FullEntity<IncompleteKey> mapBeanToEntity(final BEAN bean, @Nullable MapperCallback callback) {
         Optional<Key> optionalKey = MapperUtils.getKey(bean);
-        entityBuilder = FullEntity.newBuilder(optionalKey.isPresent() ? optionalKey.get() : createNewKey(bean));
+        FullEntity.Builder entityBuilder = FullEntity.newBuilder(optionalKey.isPresent() ? optionalKey.get() : createNewKey(bean));
 
         mapBeanValues(bean);
 
@@ -80,7 +80,7 @@ public class EntityMapper<BEAN>  {
             }
         }
         catch (IllegalAccessException ex) {
-
+            throw new FieldAccessException(field, bean.getClass());
         }
     }
 
@@ -94,7 +94,7 @@ public class EntityMapper<BEAN>  {
                     AnnotationUtils.getColumnDataType(field));
         }
         catch (IllegalAccessException ex) {
-
+            throw new FieldAccessException(field, bean.getClass());
         }
     }
 
@@ -103,7 +103,7 @@ public class EntityMapper<BEAN>  {
     }
 
     public BEAN mapEntityToBean(FullEntity<?> entity, BEAN bean, @Nullable MapperCallback callback) {
-        Map<String, Value<?>> propertyMap = entity.getNames().stream()
+        Map<String, Value<?>> entityPropertyMap = entity.getNames().stream()
                 .filter(entity::contains)
                 .collect(Collectors.toMap(
                         String::toString,
@@ -111,7 +111,7 @@ public class EntityMapper<BEAN>  {
                 ));
 
         Stream.of(bean.getClass().getDeclaredFields())
-                .filter(field -> shouldMapPropertyToField(field, propertyMap))
+                .filter(field -> shouldMapPropertyToField(field, entityPropertyMap))
                 .forEach(field -> {
                     field.setAccessible(true);
 
@@ -119,15 +119,15 @@ public class EntityMapper<BEAN>  {
                         setKeyField(field, bean, entity);
                     }
                     else if (field.getType().isEnum()) {
-                        setEnumField(field, bean, propertyMap);
+                        setEnumField(field, bean, entityPropertyMap);
                     }
                     else {
-                        setField(field, bean, propertyMap);
+                        setField(field, bean, entityPropertyMap);
                     }
                 });
 
         if (callback != null) {
-            callback.mapProvidedProperties(propertyMap, bean);
+            callback.mapProvidedProperties(entityPropertyMap, bean);
         }
 
         return bean;
@@ -147,7 +147,7 @@ public class EntityMapper<BEAN>  {
             field.set(bean, entity.getKey());
         }
         catch (IllegalAccessException ex) {
-
+            throw new FieldAccessException(field, bean.getClass());
         }
     }
 
@@ -165,7 +165,7 @@ public class EntityMapper<BEAN>  {
             }
         }
         catch (IllegalAccessException ex) {
-
+            throw new FieldAccessException(field, bean.getClass());
         }
     }
 
@@ -184,14 +184,15 @@ public class EntityMapper<BEAN>  {
 
                 case STRING: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());     break;
                 case LONG: field.set(bean, propertyMap.get(AnnotationUtils.getColumnValue(field)).get());       break;
+                default: break;
             }
         }
         catch (IllegalAccessException ex) {
-
+            throw new FieldAccessException(field, bean.getClass());
         }
     }
 
-    public void setPropertyIfPresent(String property, Object object, DataType dataType) {
+    private void setPropertyIfPresent(String property, Object object, DataType dataType) {
         if (object != null) {
             switch (dataType) {
                 case BLOB: propertyMap.put(property, BlobValue.newBuilder(
@@ -199,6 +200,7 @@ public class EntityMapper<BEAN>  {
 
                 case STRING: propertyMap.put(property, StringValue.of((String) object));                         break;
                 case LONG: propertyMap.put(property, LongValue.of((Long) object));                               break;
+                default: break;
             }
         }
     }

@@ -8,6 +8,10 @@ import java.io.ObjectInputStream;
 
 public class PropertyConversionUtils {
 
+    private PropertyConversionUtils() {
+
+    }
+
     public static <T> Blob convertToBlob(T type) {
         return Blob.copyFrom(ByteBufferUtils.serialize(type));
     }

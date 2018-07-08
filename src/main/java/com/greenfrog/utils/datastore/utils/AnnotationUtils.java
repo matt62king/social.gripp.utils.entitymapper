@@ -16,6 +16,10 @@ import java.lang.reflect.Field;
 
 public class AnnotationUtils {
 
+    private AnnotationUtils() {
+
+    }
+
     public static <T> String getStoreName(Class<T> clazz) {
         return clazz.getAnnotation(Store.class).value();
     }

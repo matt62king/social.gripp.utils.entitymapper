@@ -5,7 +5,6 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.StructuredQuery;
 import com.greenfrog.utils.datastore.cache.DatastoreCache;
-import com.greenfrog.utils.datastore.cache.annotaions.Cache;
 import com.greenfrog.utils.datastore.cache.key.CacheKey;
 import com.greenfrog.utils.datastore.cache.key.CacheKeyBuilder;
 import com.greenfrog.utils.datastore.fecher.Fetcher;
@@ -28,24 +27,7 @@ public class SingleEntityFetcher extends Fetcher {
 
     public <T> List<T> getByIndexedId(Class<T> clazz, String value) {
         return getBySingleProperty(clazz, MapperUtils.getIndexedId(clazz), value);
-
-//        CacheKey cacheKey = CacheKeyBuilder.buildCacheKey(clazz, value);
-//        List<T> results = CacheUtils.fetchResultsFromCache(clazz, cacheKey, getDatastoreCache());
-//
-//        if (results.isEmpty()) {
-//            QueryResults<Entity> queryResults = fetchedByIndexedId(clazz, value);
-//            results = MapperUtils.convertResultsToList(clazz, queryResults);
-//        }
-//
-//        return results;
     }
-
-//    public QueryResults<Entity> fetchedByIndexedId(Class bClass, String value) {
-//        return new SimpleFetcher(getDatastore()).fetchBySingleProperty(
-//                AnnotationUtils.getStoreName(bClass),
-//                MapperUtils.getIndexedId(bClass),
-//                value);
-//    }
 
     public <T> List<T> getBySingleProperty(Class<T> clazz, String property, String value) {
         CacheKey cacheKey = CacheKeyBuilder.buildCacheKey(clazz, value);
@@ -57,9 +39,6 @@ public class SingleEntityFetcher extends Fetcher {
         }
 
         return results;
-
-//        QueryResults<Entity> queryResults = fetchedBySingleProperty(clazz, property, value);
-//        return MapperUtils.convertResultsToList(clazz, queryResults);
     }
 
     public QueryResults<Entity> fetchedBySingleProperty(Class clazz, String property, String value) {

@@ -2,6 +2,7 @@ package com.greenfrog.utils.datastore.mapper.mapper;
 
 import com.google.cloud.datastore.FullEntity;
 import com.google.cloud.datastore.IncompleteKey;
+import com.greenfrog.utils.datastore.exceptions.BeanInstanceException;
 
 public class DefaultMapper<BEAN> extends Mapper<BEAN> {
     private final EntityMapper<BEAN> entityMapper = new EntityMapper<>();
@@ -22,9 +23,7 @@ public class DefaultMapper<BEAN> extends Mapper<BEAN> {
             return entityMapper.mapEntityToBean(entity, beanClass.newInstance());
         }
         catch (Exception e) {
-
+            throw new BeanInstanceException(beanClass);
         }
-
-        return null;
     }
 }

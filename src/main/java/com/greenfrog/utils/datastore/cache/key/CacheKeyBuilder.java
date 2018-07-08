@@ -7,6 +7,10 @@ import java.util.stream.Stream;
 
 public class CacheKeyBuilder {
 
+    private CacheKeyBuilder() {
+
+    }
+
     public static <T> CacheKey buildCacheKey(Class<T> clazz, String queryString) {
         return new CacheKey(clazz.getAnnotation(Store.class).value(), queryString);
     }
@@ -15,7 +19,7 @@ public class CacheKeyBuilder {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(filter.toString());
 
-        Stream.of(filter).forEach(filter1 -> stringBuilder.append(filter1.toString()));
+        Stream.of(filters).forEach(filter1 -> stringBuilder.append(filter1.toString()));
 
         return new CacheKey(clazz.getAnnotation(Store.class).value(), stringBuilder.toString());
     }

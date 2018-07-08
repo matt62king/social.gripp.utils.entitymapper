@@ -1,7 +1,6 @@
 package com.greenfrog.utils.datastore.fecher.manual;
 
 import com.google.cloud.datastore.*;
-import com.greenfrog.utils.datastore.cache.DatastoreCache;
 import com.greenfrog.utils.datastore.fecher.Fetcher;
 
 public class SimpleFetcher extends Fetcher {

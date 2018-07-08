@@ -9,6 +9,10 @@ import java.util.Optional;
 
 public class CacheUtils {
 
+    private CacheUtils() {
+
+    }
+
     public static <T> List<T> fetchResultsFromCache(Class<T> clazz, CacheKey cacheKey, DatastoreCache datastoreCache) {
         Optional<List<T>> cacheResult = CacheUtils.fetchFromCache(cacheKey, datastoreCache);
         return cacheResult.orElse(new ArrayList<>());

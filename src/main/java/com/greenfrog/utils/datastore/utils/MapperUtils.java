@@ -3,6 +3,7 @@ package com.greenfrog.utils.datastore.utils;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.QueryResults;
+import com.greenfrog.utils.datastore.exceptions.FieldAccessException;
 import com.greenfrog.utils.datastore.exceptions.InvalidMapperException;
 import com.greenfrog.utils.datastore.exceptions.NoIndexedIdException;
 import com.greenfrog.utils.datastore.fecher.annotaions.MapConstructor;
@@ -19,6 +20,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MapperUtils {
+
+    private MapperUtils() {
+
+    }
 
     public static <T> Mapper<T> getMapperForClass(Class<T> clazz) {
         try {
@@ -76,10 +81,8 @@ public class MapperUtils {
             }
         }
         catch (IllegalAccessException ex) {
-
+            throw new FieldAccessException(keyField.get(), bean.getClass());
         }
-
-        return Optional.empty();
     }
 
     public static <T> List<Field> getToManyRelationalFields(Class<T> clazz) {

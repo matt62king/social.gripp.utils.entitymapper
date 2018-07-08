@@ -4,12 +4,10 @@ import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.QueryResults;
 import com.greenfrog.utils.datastore.cache.DatastoreCache;
-import com.greenfrog.utils.datastore.cache.key.CacheKey;
-import com.greenfrog.utils.datastore.cache.key.CacheKeyBuilder;
+import com.greenfrog.utils.datastore.exceptions.FieldAccessException;
 import com.greenfrog.utils.datastore.fecher.Fetcher;
 import com.greenfrog.utils.datastore.fecher.manual.MultiEntityFetcher;
 import com.greenfrog.utils.datastore.utils.AnnotationUtils;
-import com.greenfrog.utils.datastore.utils.CacheUtils;
 import com.greenfrog.utils.datastore.utils.MapperUtils;
 
 import java.lang.reflect.Field;
@@ -59,7 +57,7 @@ public class JoinedEntityFetcher extends Fetcher {
                     value));
         }
         catch (IllegalAccessException ex) {
-
+            throw new FieldAccessException(field, entity.getClass());
         }
     }
 
